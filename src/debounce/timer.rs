@@ -14,7 +14,7 @@ use debounce::OperationsBuffer;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ScheduledEvent {
-    id: u64,
+    id: usize,
     when: Instant,
     path: PathBuf,
 }
@@ -137,7 +137,7 @@ impl ScheduleWorker {
 
 #[derive(Clone)]
 pub struct WatchTimer {
-    counter: u64,
+    counter: usize,
     new_event_trigger: Arc<Condvar>,
     stop_trigger: Arc<Condvar>,
     delay: Duration,
@@ -221,7 +221,7 @@ impl WatchTimer {
         }
     }
 
-    pub fn schedule(&mut self, path: PathBuf) -> u64 {
+    pub fn schedule(&mut self, path: PathBuf) -> usize {
         self.counter = self.counter.wrapping_add(1);
 
         self.events.lock().unwrap().push_back(ScheduledEvent {
@@ -235,7 +235,7 @@ impl WatchTimer {
         self.counter
     }
 
-    pub fn ignore(&self, id: u64) {
+    pub fn ignore(&self, id: usize) {
         let mut events = self.events.lock().unwrap();
         let index = events.iter().rposition(|e| e.id == id);
         if let Some(index) = index {
